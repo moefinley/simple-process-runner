@@ -11,6 +11,7 @@ export function start() {
     }).catch(() => {
         console.log(config.errorMessage);
         killAll();
+        process.exit(1);
     });
 }
 //# sourceMappingURL=main.mjs.map

@@ -11,7 +11,8 @@ type ProcessConfig = {
 export interface Config {
     processes: ProcessConfig[],
     successMessage: string,
-    errorMessage: string
+    errorMessage: string,
+    runConcurrently: boolean
 }
 
 export function start(){
@@ -27,5 +28,6 @@ export function start(){
     }).catch(() => {
         console.log(config.errorMessage);
         killAll();
+        process.exit(1);
     });
 }

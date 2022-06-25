@@ -1,6 +1,7 @@
 {
   "successMessage": "All processes completed successfully",
   "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
+  "runConcurrently": false,
   "processes": [
     {
       "name": "List files",
