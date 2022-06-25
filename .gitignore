@@ -1,6 +1,5 @@
 # Project exclude paths
 /node_modules/
-/src/*.mjs
 /src/*.map
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
