@@ -12,24 +12,7 @@ export function run(config) {
     }
     else {
         return new Promise((parentResolve, parentReject) => {
-            function* serialRunner() {
-                let index = 0;
-                while (index < config.processes.length) {
-                    let process = config.processes[index];
-                    let execaProcess;
-                    try {
-                        console.log('Starting process: ', process.name);
-                        execaProcess = execa(process.command, process.args?.split(' '), { signal: abortController.signal });
-                        execaProcess.stdout.on('data', data => console.log(`${process.name}::: `, data.toString()));
-                    }
-                    catch (e) {
-                        yield e;
-                    }
-                    yield execaProcess;
-                    index = index + 1;
-                }
-            }
-            let generator = serialRunner();
+            let generator = serialRunner(config.processes);
             let runProcesses = [];
             function runNextProcess() {
                 let generatorResult = generator.next();
@@ -57,5 +40,22 @@ export function run(config) {
 }
 export function killAll() {
     abortController.abort();
+}
+function* serialRunner(processes) {
+    let index = 0;
+    while (index < processes.length) {
+        let process = processes[index];
+        let execaProcess;
+        try {
+            console.log('Starting process: ', process.name);
+            execaProcess = execa(process.command, process.args?.split(' '), { signal: abortController.signal });
+            execaProcess.stdout.on('data', data => console.log(`${process.name}::: `, data.toString()));
+        }
+        catch (e) {
+            yield e;
+        }
+        yield execaProcess;
+        index = index + 1;
+    }
 }
 //# sourceMappingURL=runner.mjs.map

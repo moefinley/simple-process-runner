@@ -1,4 +1,4 @@
-import {Config} from "./main.mjs";
+import type {Config, ProcessConfig} from "./config.mjs";
 import {execa, ExecaChildProcess, ExecaReturnValue} from 'execa';
 
 let execaProcesses: ExecaChildProcess[] = [];
@@ -15,27 +15,9 @@ export function run(config: Config): Promise<ExecaReturnValue[]> {
         return Promise.all(execaProcesses);
     } else {
         return new Promise<ExecaReturnValue[]>((parentResolve, parentReject) => {
-            function* serialRunner() {
-                let index = 0;
 
-                while (index < config.processes.length) {
-                    let process = config.processes[index];
-                    let execaProcess;
 
-                    try {
-                        console.log('Starting process: ', process.name);
-                        execaProcess = execa(process.command, process.args?.split(' '), {signal: abortController.signal});
-                        execaProcess.stdout.on('data', data => console.log(`${process.name}::: `, data.toString()));
-                    } catch (e) {
-                        yield e;
-                    }
-
-                    yield execaProcess;
-                    index = index + 1;
-                }
-            }
-
-            let generator = serialRunner();
+            let generator = serialRunner(config.processes);
             let runProcesses = [];
 
             function runNextProcess() {
@@ -67,4 +49,24 @@ export function run(config: Config): Promise<ExecaReturnValue[]> {
 
 export function killAll() {
     abortController.abort();
+}
+
+function* serialRunner(processes: ProcessConfig[]) {
+    let index = 0;
+
+    while (index < processes.length) {
+        let process = processes[index];
+        let execaProcess;
+
+        try {
+            console.log('Starting process: ', process.name);
+            execaProcess = execa(process.command, process.args?.split(' '), {signal: abortController.signal});
+            execaProcess.stdout.on('data', data => console.log(`${process.name}::: `, data.toString()));
+        } catch (e) {
+            yield e;
+        }
+
+        yield execaProcess;
+        index = index + 1;
+    }
 }

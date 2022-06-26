@@ -1,19 +1,7 @@
 import {Argument, program} from 'commander';
 import * as fs from "fs";
 import {killAll, run} from "./runner.mjs";
-
-type ProcessConfig = {
-    name: string,
-    command: string,
-    args?: string
-}
-
-export interface Config {
-    processes: ProcessConfig[],
-    successMessage: string,
-    errorMessage: string,
-    runConcurrently: boolean
-}
+import type {Config} from "./config.mjs";
 
 export function start(){
     program.addArgument(new Argument('Config', 'JSON file containing the config including the processes you want to run'));
