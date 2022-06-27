@@ -1,0 +1,26 @@
+{
+  "successMessage": "All processes completed successfully",
+  "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
+  "runConcurrently": false,
+  "processes": [
+    {
+      "name": "List files",
+      "command": "dir"
+    },
+    {
+      "name": "Process One",
+      "command": "node",
+      "args": "run-successfully-2sec.js"
+    },
+    {
+      "name": "Process Two",
+      "command": "node",
+      "args": "run-successfully-3sec.js"
+    },
+    {
+      "name": "Should fail after everything else",
+      "command": "node",
+      "args": "exit-code-fail-2secs.js"
+    }
+  ]
+}

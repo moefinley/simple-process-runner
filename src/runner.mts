@@ -7,38 +7,35 @@ const abortController = new AbortController();
 export function run(config: Config): Promise<ExecaReturnValue[]> {
     if (config.runConcurrently) {
         config.processes.forEach(process => {
-            let execaProcess = execa(process.command, process.args?.split(' '), {signal: abortController.signal});
-            execaProcess.stdout.on('data', data => console.log(`${process.name}::: `, data.toString()));
+            let execaProcess = runProcess(process);
             execaProcesses.push(execaProcess);
         });
 
         return Promise.all(execaProcesses);
     } else {
         return new Promise<ExecaReturnValue[]>((parentResolve, parentReject) => {
-
-
             let generator = serialRunner(config.processes);
-            let runProcesses = [];
+            let startedProcesses = [];
 
             function runNextProcess() {
                 let generatorResult = generator.next();
                 let process = generatorResult.value as ExecaChildProcess<string>;
                 if (process instanceof Error) {
-                    console.log('Rejecting because process was null');
+                    console.log('Ending serial run because process failed to start');
                     parentReject(process);
                 }
                 if (process != null) {
                     process.then(() => {
-                        runProcesses.push(process);
+                        startedProcesses.push(process);
                         runNextProcess();
                     }).catch(e => {
                             console.log('Error running process: ', e);
-                        parentReject('process failed');
+                            parentReject('process failed');
                         }
                     );
                 }
-                if(generatorResult.done){
-                    parentResolve(runProcesses);
+                if (generatorResult.done) {
+                    parentResolve(startedProcesses);
                 }
             }
 
@@ -59,9 +56,7 @@ function* serialRunner(processes: ProcessConfig[]) {
         let execaProcess;
 
         try {
-            console.log('Starting process: ', process.name);
-            execaProcess = execa(process.command, process.args?.split(' '), {signal: abortController.signal});
-            execaProcess.stdout.on('data', data => console.log(`${process.name}::: `, data.toString()));
+            execaProcess = runProcess(process);
         } catch (e) {
             yield e;
         }
@@ -69,4 +64,24 @@ function* serialRunner(processes: ProcessConfig[]) {
         yield execaProcess;
         index = index + 1;
     }
+}
+
+function runProcess(childProcessConfig: ProcessConfig): ExecaChildProcess {
+    console.log('Starting process: ', childProcessConfig.name);
+    let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {signal: abortController.signal});
+    execaProcess.stdout.on('data', data => {
+        console.log(`${childProcessConfig.name}::: `, data.toString());
+        checkForFailureStrings(childProcessConfig, data);
+    });
+    return execaProcess;
+}
+
+function checkForFailureStrings(childProcessConfig: ProcessConfig, stdOut: string) {
+    childProcessConfig.failIfSeen?.forEach(failIfSeenString => {
+        if (stdOut.includes(failIfSeenString)) {
+            console.log('Found failIfSeen string: ', failIfSeenString);
+            killAll();
+            process.exit(2);
+        }
+    });
 }

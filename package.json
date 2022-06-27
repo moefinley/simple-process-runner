@@ -5,7 +5,9 @@
   "main": "index.mjs",
   "bin": "./index.mjs",
   "scripts": {
-    "test": "node ./index.mjs ./test/config.json"
+    "test-serial": "node ./index.mjs test/serial-config.json",
+    "test-concurrent": "node ./index.mjs test/concurrent-config.json",
+    "test-string": "node ./index.mjs test/string-fail-config.json"
   },
   "keywords": [],
   "author": "",

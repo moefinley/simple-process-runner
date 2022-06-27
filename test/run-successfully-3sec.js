@@ -4,4 +4,4 @@ setTimeout(() => {
     console.log(`${processName} hello world...`);
     console.log(`${processName} I'm ok`);
     process.exit(0);
-}, 2000);
+}, 3000);

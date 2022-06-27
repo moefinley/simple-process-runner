@@ -8,5 +8,6 @@ export interface Config {
 export type ProcessConfig = {
     name: string,
     command: string,
-    args?: string
+    args?: string,
+    failIfSeen: string[]
 }
