@@ -37,9 +37,9 @@ export function run(config) {
         });
     }
 }
-export function killAll() {
+export const killAll = () => {
     abortController.abort();
-}
+};
 function* serialRunner(processes) {
     let index = 0;
     while (index < processes.length) {
@@ -55,7 +55,7 @@ function* serialRunner(processes) {
         index = index + 1;
     }
 }
-function runProcess(childProcessConfig) {
+const runProcess = (childProcessConfig) => {
     console.log('Starting process: ', childProcessConfig.name);
     let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), { signal: abortController.signal });
     execaProcess.stdout.on('data', data => {
@@ -63,8 +63,8 @@ function runProcess(childProcessConfig) {
         checkForFailureStrings(childProcessConfig, data);
     });
     return execaProcess;
-}
-function checkForFailureStrings(childProcessConfig, stdOut) {
+};
+const checkForFailureStrings = (childProcessConfig, stdOut) => {
     childProcessConfig.failIfSeen?.forEach(failIfSeenString => {
         if (stdOut.includes(failIfSeenString)) {
             console.log('Found failIfSeen string: ', failIfSeenString);
@@ -72,5 +72,5 @@ function checkForFailureStrings(childProcessConfig, stdOut) {
             process.exit(2);
         }
     });
-}
+};
 //# sourceMappingURL=runner.mjs.map

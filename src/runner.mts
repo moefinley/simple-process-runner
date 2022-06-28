@@ -44,7 +44,7 @@ export function run(config: Config): Promise<ExecaReturnValue[]> {
     }
 }
 
-export function killAll() {
+export const killAll = () => {
     abortController.abort();
 }
 
@@ -66,7 +66,7 @@ function* serialRunner(processes: ProcessConfig[]) {
     }
 }
 
-function runProcess(childProcessConfig: ProcessConfig): ExecaChildProcess {
+const runProcess = (childProcessConfig: ProcessConfig): ExecaChildProcess => {
     console.log('Starting process: ', childProcessConfig.name);
     let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {signal: abortController.signal});
     execaProcess.stdout.on('data', data => {
@@ -76,7 +76,7 @@ function runProcess(childProcessConfig: ProcessConfig): ExecaChildProcess {
     return execaProcess;
 }
 
-function checkForFailureStrings(childProcessConfig: ProcessConfig, stdOut: string) {
+const checkForFailureStrings = (childProcessConfig: ProcessConfig, stdOut: string) => {
     childProcessConfig.failIfSeen?.forEach(failIfSeenString => {
         if (stdOut.includes(failIfSeenString)) {
             console.log('Found failIfSeen string: ', failIfSeenString);

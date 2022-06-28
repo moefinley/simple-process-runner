@@ -49,3 +49,5 @@ Create a config file
   ]
 }
 ```
+##Requirements
+Requires Node 16 or greater
