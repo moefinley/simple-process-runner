@@ -1,6 +1,6 @@
 {
   "name": "simple-process-runner",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Run multiple processes and correctly return exit codes through the parent process, write out specific text on any failure (good for reporting to CI tools like TeamCity or Jenkins), run concurrently or one after the other",
   "main": "index.mjs",
   "bin": "./index.mjs",
@@ -12,7 +12,13 @@
   "repository": "https://github.com/moefinley/simple-process-runner",
   "homepage": "https://github.com/moefinley/simple-process-runner",
   "readme": "README.md",
-  "keywords": ["process", "concurrent", "teamcity", "jenkins", "ci"],
+  "keywords": [
+    "process",
+    "concurrent",
+    "teamcity",
+    "jenkins",
+    "ci"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
