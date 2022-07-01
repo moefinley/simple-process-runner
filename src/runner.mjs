@@ -1,5 +1,6 @@
 import { execa } from 'execa';
-let execaProcesses = [];
+const allProcesses = [];
+const processesToWaitOn = [];
 const abortController = new AbortController();
 export function run(config) {
     // Start runAlongSide processes
@@ -7,7 +8,7 @@ export function run(config) {
         runProcess(process, false);
     });
     // Start serial processes
-    execaProcesses.push(new Promise((parentResolve, parentReject) => {
+    processesToWaitOn.push(new Promise((parentResolve, parentReject) => {
         let generator = serialRunner(config.serialProcesses);
         let serialProcesses = [];
         function runNextProcess() {
@@ -37,12 +38,17 @@ export function run(config) {
     // Start concurrent processes
     config.concurrentProcesses?.forEach(process => {
         let execaProcess = runProcess(process);
-        execaProcesses.push(execaProcess);
+        processesToWaitOn.push(execaProcess);
     });
-    return Promise.all(execaProcesses);
+    return Promise.all(processesToWaitOn);
 }
 export const killAll = () => {
     abortController.abort();
+    allProcesses.forEach(process => {
+        process.kill('SIGTERM', {
+            forceKillAfterTimeout: 2000
+        });
+    });
 };
 function* serialRunner(processes) {
     let index = 0;
@@ -67,6 +73,7 @@ const runProcess = (childProcessConfig, shouldCheckForFailureStrings = true) => 
         if (shouldCheckForFailureStrings)
             checkForFailureStrings(childProcessConfig, data);
     });
+    allProcesses.push(execaProcess);
     return execaProcess;
 };
 const checkForFailureStrings = (childProcessConfig, stdOut) => {
