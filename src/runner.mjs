@@ -2,6 +2,10 @@ import { execa } from 'execa';
 let execaProcesses = [];
 const abortController = new AbortController();
 export function run(config) {
+    // Start runAlongSide processes
+    config.runAlongsideProcesses?.forEach(process => {
+        runProcess(process, false);
+    });
     // Start serial processes
     execaProcesses.push(new Promise((parentResolve, parentReject) => {
         let generator = serialRunner(config.serialProcesses);
@@ -55,12 +59,13 @@ function* serialRunner(processes) {
         index = index + 1;
     }
 }
-const runProcess = (childProcessConfig) => {
+const runProcess = (childProcessConfig, shouldCheckForFailureStrings = true) => {
     console.log('Starting process: ', childProcessConfig.name);
     let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), { signal: abortController.signal });
     execaProcess.stdout.on('data', data => {
         console.log(`${childProcessConfig.name}::: `, data.toString());
-        checkForFailureStrings(childProcessConfig, data);
+        if (shouldCheckForFailureStrings)
+            checkForFailureStrings(childProcessConfig, data);
     });
     return execaProcess;
 };

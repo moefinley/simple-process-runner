@@ -5,6 +5,11 @@ let execaProcesses: Array<Promise<ExecaReturnValue | ExecaReturnValue[]>> = [];
 const abortController = new AbortController();
 
 export function run(config: Config): Promise<Array<ExecaReturnValue | ExecaReturnValue[]>> {
+    // Start runAlongSide processes
+    config.runAlongsideProcesses?.forEach(process => {
+        runProcess(process, false);
+    });
+
     // Start serial processes
     execaProcesses.push(new Promise<ExecaReturnValue[]>((parentResolve, parentReject) => {
         let generator = serialRunner(config.serialProcesses);
@@ -37,6 +42,7 @@ export function run(config: Config): Promise<Array<ExecaReturnValue | ExecaRetur
 
         runNextProcess();
     }));
+
     // Start concurrent processes
     config.concurrentProcesses?.forEach(process => {
         let execaProcess = runProcess(process);
@@ -68,12 +74,13 @@ function* serialRunner(processes: ProcessConfig[]) {
     }
 }
 
-const runProcess = (childProcessConfig: ProcessConfig): ExecaChildProcess => {
+const runProcess = (childProcessConfig: ProcessConfig, shouldCheckForFailureStrings: boolean = true): ExecaChildProcess => {
     console.log('Starting process: ', childProcessConfig.name);
     let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {signal: abortController.signal});
     execaProcess.stdout.on('data', data => {
         console.log(`${childProcessConfig.name}::: `, data.toString());
-        checkForFailureStrings(childProcessConfig, data);
+        if(shouldCheckForFailureStrings)
+            checkForFailureStrings(childProcessConfig, data);
     });
     return execaProcess;
 }

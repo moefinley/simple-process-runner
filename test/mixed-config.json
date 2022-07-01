@@ -1,6 +1,13 @@
 {
   "successMessage": "All processes completed successfully",
   "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
+  "runAlongsideProcesses": [
+    {
+      "name": "Run alongside process",
+      "command": "node",
+      "args": "ongoing-process.js"
+    }
+  ],
   "concurrentProcesses": [
     {
       "name": "Ongoing process",

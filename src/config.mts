@@ -1,4 +1,5 @@
 export interface Config {
+    runAlongsideProcesses: ProcessConfig[],
     concurrentProcesses: ProcessConfig[],
     serialProcesses: ProcessConfig[],
     successMessage: string,
