@@ -10,7 +10,8 @@ export function start(){
 
     let { name, ext, dir } = path.parse(program.args[0]);
 
-    process.chdir(dir);
+    if(dir)
+        process.chdir(dir);
     const config = JSON.parse(fs.readFileSync(name + ext).toString()) as Config;
 
     run(config).then(() => {
