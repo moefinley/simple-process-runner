@@ -7,7 +7,8 @@
   "scripts": {
     "test-serial": "node ./index.mjs test/serial-config.json",
     "test-concurrent": "node ./index.mjs test/concurrent-config.json",
-    "test-string": "node ./index.mjs test/string-fail-config.json"
+    "test-string": "node ./index.mjs test/string-fail-config.json",
+    "test-mixed": "node ./index.mjs test/mixed-config.json"
   },
   "repository": "https://github.com/moefinley/simple-process-runner",
   "homepage": "https://github.com/moefinley/simple-process-runner",

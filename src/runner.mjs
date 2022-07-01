@@ -2,47 +2,47 @@ import { execa } from 'execa';
 let execaProcesses = [];
 const abortController = new AbortController();
 export function run(config) {
-    if (config.runConcurrently) {
-        config.processes.forEach(process => {
-            let execaProcess = runProcess(process);
-            execaProcesses.push(execaProcess);
-        });
-        return Promise.all(execaProcesses);
-    }
-    else {
-        return new Promise((parentResolve, parentReject) => {
-            let generator = serialRunner(config.processes);
-            let startedProcesses = [];
-            function runNextProcess() {
-                let generatorResult = generator.next();
-                let process = generatorResult.value;
-                if (process instanceof Error) {
-                    console.log('Ending serial run because process failed to start');
-                    parentReject(process);
-                }
-                if (process != null) {
-                    process.then(() => {
-                        startedProcesses.push(process);
-                        runNextProcess();
-                    }).catch(e => {
-                        console.log('Error running process: ', e);
-                        parentReject('process failed');
-                    });
-                }
-                if (generatorResult.done) {
-                    parentResolve(startedProcesses);
-                }
+    // Start serial processes
+    execaProcesses.push(new Promise((parentResolve, parentReject) => {
+        let generator = serialRunner(config.serialProcesses);
+        let serialProcesses = [];
+        function runNextProcess() {
+            let generatorResult = generator.next();
+            let process = generatorResult.value;
+            if (process instanceof Error) {
+                console.log('Ending serial run because process failed to start');
+                parentReject(process);
             }
-            runNextProcess();
-        });
-    }
+            if (process != null) {
+                serialProcesses.push(process);
+                process.then(() => {
+                    runNextProcess();
+                }).catch(e => {
+                    console.log('Error running process: ', e);
+                    parentReject('process failed');
+                });
+            }
+            if (generatorResult.done) {
+                Promise.all(serialProcesses).then(execaReturnValues => {
+                    parentResolve(execaReturnValues);
+                });
+            }
+        }
+        runNextProcess();
+    }));
+    // Start concurrent processes
+    config.concurrentProcesses?.forEach(process => {
+        let execaProcess = runProcess(process);
+        execaProcesses.push(execaProcess);
+    });
+    return Promise.all(execaProcesses);
 }
 export const killAll = () => {
     abortController.abort();
 };
 function* serialRunner(processes) {
     let index = 0;
-    while (index < processes.length) {
+    while (index < processes?.length) {
         let process = processes[index];
         let execaProcess;
         try {

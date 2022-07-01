@@ -1,5 +1,6 @@
 export interface Config {
-    processes: ProcessConfig[],
+    concurrentProcesses: ProcessConfig[],
+    serialProcesses: ProcessConfig[],
     successMessage: string,
     errorMessage: string,
     runConcurrently: boolean

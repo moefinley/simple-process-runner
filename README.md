@@ -11,12 +11,12 @@ To run create a config file and run `npx simple-process-runner my-config.json`
 ## How to create a config file
 
 ### Config properties
-| Config Property |                          Description                           |
-|-----------------|:--------------------------------------------------------------:|
-| `successMessage`  | The message to write when all processes complete without error |
-| `errorMessage`    |       The message to write out when any processes errors       |
-| `runConcurrently` | Boolean to specify if processes should run in parallel or not  |
-| `processes`       |      An array of process configurations (see table below)      |
+| Config Property     |                                          Description                                          |
+|---------------------|:---------------------------------------------------------------------------------------------:|
+| `successMessage`    |                The message to write when all processes complete without error                 |
+| `errorMessage`      |                      The message to write out when any processes errors                       |
+| `concurrentProcesses` |  An array of process configurations (see table below) that you want to run at the same time   |
+| `serialProcesses`   | An array of process configurations (see table below) that you want to run one after the other |
 
 ### Process Config Properties
 | Process Config Property | Description                                                                   |
@@ -31,8 +31,7 @@ To run create a config file and run `npx simple-process-runner my-config.json`
 {
   "successMessage": "All processes completed successfully",
   "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
-  "runConcurrently": true,
-  "processes": [
+  "serialProcesses": [
     {
       "name": "List files",
       "command": "powershell",
