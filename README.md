@@ -42,7 +42,7 @@ To run create a config file and run `npx simple-process-runner my-config.json`
       "name": "List files",
       "command": "powershell",
       "args": "Invoke-WebRequest -URI https://www.example.com",
-      "failIfSeen": "timeout"
+      "failIfSeen": ["timeout"]
     },
     {
       "name": "Process One",
