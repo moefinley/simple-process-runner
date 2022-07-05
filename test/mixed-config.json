@@ -4,8 +4,8 @@
   "runAlongsideProcesses": [
     {
       "name": "Run alongside process",
-      "command": "node",
-      "args": "ongoing-process.js"
+      "command": "npx",
+      "args": "http-server"
     }
   ],
   "concurrentProcesses": [

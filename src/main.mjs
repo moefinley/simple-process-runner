@@ -11,6 +11,7 @@ export function start() {
     const config = JSON.parse(fs.readFileSync(name + ext).toString());
     run(config).then(() => {
         console.log(config.successMessage);
+        process.exit(0);
     }).catch(() => {
         console.log(config.errorMessage);
         killAll();

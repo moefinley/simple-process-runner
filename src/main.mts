@@ -16,6 +16,7 @@ export function start(){
 
     run(config).then(() => {
         console.log(config.successMessage);
+        process.exit(0);
     }).catch(() => {
         console.log(config.errorMessage);
         killAll();
