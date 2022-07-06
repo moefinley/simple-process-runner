@@ -1,7 +1,7 @@
 import {Argument, program} from 'commander';
 import * as fs from "fs";
 import * as path from 'path';
-import {killAll, run} from "./runner.mjs";
+import {kill, killAll, run, runAlongsideProcesses} from "./runner.mjs";
 import type {Config} from "./config.mjs";
 import {ExecaReturnValue} from "execa";
 import {getConfig, setConfig} from "./config.mjs";
@@ -30,7 +30,7 @@ export function start(){
             }
         });
 
-
+        runAlongsideProcesses.forEach(kill);
         console.log(getConfig().successMessage);
         process.exit(0);
     }).catch(() => {

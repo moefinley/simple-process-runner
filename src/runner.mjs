@@ -1,12 +1,13 @@
 import { execa } from 'execa';
 import * as debug from "./debug.mjs";
+export const runAlongsideProcesses = [];
 const allProcesses = [];
 const processesToWaitOn = [];
 const abortController = new AbortController();
 export function run(config) {
     // Start runAlongSide processes
     config.runAlongsideProcesses?.forEach(process => {
-        runProcess(process, false);
+        runAlongsideProcesses.push(runProcess(process, false));
     });
     // Start serial processes
     processesToWaitOn.push(new Promise((parentResolve, parentReject) => {
@@ -43,14 +44,15 @@ export function run(config) {
     });
     return Promise.all(processesToWaitOn);
 }
+export function kill(process) {
+    debug.log(`Killing process ${process.pid}`);
+    process.kill('SIGTERM', {
+        forceKillAfterTimeout: 2000
+    });
+}
 export const killAll = () => {
     abortController.abort();
-    allProcesses.forEach(process => {
-        debug.log(`Killing process ${process.pid}`);
-        process.kill('SIGTERM', {
-            forceKillAfterTimeout: 2000
-        });
-    });
+    allProcesses.forEach(kill);
 };
 function* serialRunner(processes) {
     let index = 0;
@@ -69,7 +71,10 @@ function* serialRunner(processes) {
 }
 const runProcess = (childProcessConfig, shouldCheckForFailureStrings = true) => {
     console.log('Starting process: ', childProcessConfig.name);
-    let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), { signal: abortController.signal, stripFinalNewline: false });
+    let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {
+        signal: abortController.signal,
+        stripFinalNewline: false
+    });
     execaProcess.stdout.on('data', data => {
         console.log(`${childProcessConfig.name}::: `, data.toString());
         if (shouldCheckForFailureStrings)

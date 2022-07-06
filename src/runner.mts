@@ -2,6 +2,7 @@ import type {Config, ProcessConfig} from "./config.mjs";
 import {execa, ExecaChildProcess, ExecaReturnValue} from 'execa';
 import * as debug from "./debug.mjs";
 
+export const runAlongsideProcesses: Array<ExecaChildProcess> = [];
 const allProcesses: Array<ExecaChildProcess> = [];
 const processesToWaitOn: Array<Promise<ExecaReturnValue | ExecaReturnValue[]>> = [];
 const abortController = new AbortController();
@@ -9,7 +10,7 @@ const abortController = new AbortController();
 export function run(config: Config): Promise<Array<ExecaReturnValue | ExecaReturnValue[]>> {
     // Start runAlongSide processes
     config.runAlongsideProcesses?.forEach(process => {
-        runProcess(process, false);
+        runAlongsideProcesses.push(runProcess(process, false));
     });
 
     // Start serial processes
@@ -54,14 +55,16 @@ export function run(config: Config): Promise<Array<ExecaReturnValue | ExecaRetur
     return Promise.all(processesToWaitOn);
 }
 
+export function kill(process) {
+    debug.log(`Killing process ${process.pid}`)
+    process.kill('SIGTERM', {
+        forceKillAfterTimeout: 2000
+    });
+}
+
 export const killAll = () => {
     abortController.abort();
-    allProcesses.forEach(process => {
-        debug.log(`Killing process ${process.pid}`)
-        process.kill('SIGTERM', {
-            forceKillAfterTimeout: 2000
-        });
-    });
+    allProcesses.forEach(kill);
 }
 
 function* serialRunner(processes: ProcessConfig[]) {
@@ -84,7 +87,10 @@ function* serialRunner(processes: ProcessConfig[]) {
 
 const runProcess = (childProcessConfig: ProcessConfig, shouldCheckForFailureStrings: boolean = true): ExecaChildProcess => {
     console.log('Starting process: ', childProcessConfig.name);
-    let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {signal: abortController.signal, stripFinalNewline: false});
+    let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {
+        signal: abortController.signal,
+        stripFinalNewline: false
+    });
     execaProcess.stdout.on('data', data => {
         console.log(`${childProcessConfig.name}::: `, data.toString());
         if (shouldCheckForFailureStrings)

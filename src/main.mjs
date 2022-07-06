@@ -1,7 +1,7 @@
 import { Argument, program } from 'commander';
 import * as fs from "fs";
 import * as path from 'path';
-import { killAll, run } from "./runner.mjs";
+import { kill, killAll, run, runAlongsideProcesses } from "./runner.mjs";
 import { getConfig, setConfig } from "./config.mjs";
 import * as debug from "./debug.mjs";
 export function start() {
@@ -23,6 +23,7 @@ export function start() {
                 logCompletedProcess(value);
             }
         });
+        runAlongsideProcesses.forEach(kill);
         console.log(getConfig().successMessage);
         process.exit(0);
     }).catch(() => {
