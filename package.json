@@ -1,6 +1,6 @@
 {
   "name": "simple-process-runner",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Run multiple processes and correctly return exit codes through the parent process, write out specific text on any failure (good for reporting to CI tools like TeamCity or Jenkins), run concurrently or one after the other",
   "main": "index.mjs",
   "bin": "./index.mjs",
