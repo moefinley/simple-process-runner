@@ -1,4 +1,5 @@
 import { execa } from 'execa';
+import * as debug from "./debug.mjs";
 const allProcesses = [];
 const processesToWaitOn = [];
 const abortController = new AbortController();
@@ -45,6 +46,7 @@ export function run(config) {
 export const killAll = () => {
     abortController.abort();
     allProcesses.forEach(process => {
+        debug.log(`Killing process ${process.pid}`);
         process.kill('SIGTERM', {
             forceKillAfterTimeout: 2000
         });
@@ -67,7 +69,7 @@ function* serialRunner(processes) {
 }
 const runProcess = (childProcessConfig, shouldCheckForFailureStrings = true) => {
     console.log('Starting process: ', childProcessConfig.name);
-    let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), { signal: abortController.signal });
+    let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), { signal: abortController.signal, stripFinalNewline: false });
     execaProcess.stdout.on('data', data => {
         console.log(`${childProcessConfig.name}::: `, data.toString());
         if (shouldCheckForFailureStrings)

@@ -4,7 +4,7 @@ export interface Config {
     serialProcesses: ProcessConfig[],
     successMessage: string,
     errorMessage: string,
-    runConcurrently: boolean
+    debug: boolean
 }
 
 export type ProcessConfig = {
@@ -12,4 +12,21 @@ export type ProcessConfig = {
     command: string,
     args?: string,
     failIfSeen: string[]
+}
+
+let _config: Config = {
+    concurrentProcesses: [],
+    debug: false,
+    errorMessage: "",
+    runAlongsideProcesses: [],
+    serialProcesses: [],
+    successMessage: ""
+}
+
+export function setConfig(config: Partial<Config>) {
+    _config = { ..._config, ...config };
+}
+
+export function getConfig(): Config {
+    return _config;
 }

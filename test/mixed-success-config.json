@@ -1,0 +1,35 @@
+{
+  "successMessage": "All processes completed successfully",
+  "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
+  "debug": true,
+  "runAlongsideProcesses": [
+    {
+      "name": "Run alongside process",
+      "command": "npx",
+      "args": "http-server"
+    }
+  ],
+  "concurrentProcesses": [
+    {
+      "name": "Ongoing process",
+      "command": "node",
+      "args": "ongoing-process.js"
+    }
+  ],
+  "serialProcesses": [
+    {
+      "name": "List files",
+      "command": "dir"
+    },
+    {
+      "name": "Process One",
+      "command": "node",
+      "args": "run-successfully-2sec.js"
+    },
+    {
+      "name": "Process Two",
+      "command": "node",
+      "args": "run-successfully-3sec.js"
+    }
+  ]
+}
