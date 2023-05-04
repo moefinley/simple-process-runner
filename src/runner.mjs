@@ -1,5 +1,6 @@
 import { execa } from 'execa';
 import * as debug from "./debug.mjs";
+import { getConfig } from "./config.mjs";
 export const runAlongsideProcesses = [];
 const allProcesses = [];
 const processesToWaitOn = [];
@@ -87,6 +88,7 @@ const checkForFailureStrings = (childProcessConfig, stdOut) => {
     childProcessConfig.failIfSeen?.forEach(failIfSeenString => {
         if (stdOut.includes(failIfSeenString)) {
             console.log('Found failIfSeen string: ', failIfSeenString);
+            console.log(getConfig().errorMessage);
             killAll();
             process.exit(2);
         }
