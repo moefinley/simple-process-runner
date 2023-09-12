@@ -23,7 +23,7 @@ export function run(config: Config): Promise<Array<ExecaReturnValue | ExecaRetur
             let generatorResult = generator.next();
             let process = generatorResult.value as ExecaChildProcess<string>;
             if (process instanceof Error) {
-                console.log('Ending serial run because process failed to start');
+                console.error('Ending serial run because process failed to start');
                 parentReject(process);
             }
             if (process != null) {
@@ -31,7 +31,7 @@ export function run(config: Config): Promise<Array<ExecaReturnValue | ExecaRetur
                 process.then(() => {
                     runNextProcess();
                 }).catch(e => {
-                        console.log('Error running process: ', e);
+                        console.error('Error running process: ', e);
                         parentReject('process failed');
                     }
                 );
