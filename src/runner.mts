@@ -10,6 +10,7 @@ const allProcesses: Array<ExecaChildProcess> = [];
 const processesToWaitOn: Array<Promise<ExecaReturnValue | ExecaReturnValue[]>> = [];
 const abortController = new AbortController();
 let counter = 0;
+
 export function run(config: Config): Promise<Array<ExecaReturnValue | ExecaReturnValue[]>> {
     // Start runAlongSide processes
     config.runAlongsideProcesses?.forEach(process => {
@@ -99,7 +100,7 @@ function* serialRunner(processes: ProcessConfig[]) {
 }
 
 const runProcess = (childProcessConfig: ProcessConfig, processLogFilename: string, shouldCheckForFailureStrings: boolean = true): ExecaChildProcess => {
-    const repeatMessage = typeof childProcessConfig.numberOfRuns === 'number' ? `${childProcessConfig.numberOfRuns} run${childProcessConfig.numberOfRuns > 1 ? 's' : ''} remaining` : '';
+    const repeatMessage = typeof childProcessConfig.numberOfRuns === 'number' && !isNaN(childProcessConfig.numberOfRuns) ? `${childProcessConfig.numberOfRuns} run${childProcessConfig.numberOfRuns > 1 ? 's' : ''} remaining` : '';
     console.log('Starting process', `"${childProcessConfig.name}"`, repeatMessage);
     let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {
         signal: abortController.signal,
@@ -111,16 +112,22 @@ const runProcess = (childProcessConfig: ProcessConfig, processLogFilename: strin
             checkForFailureStrings(childProcessConfig, data);
     });
     let count = counter++;
-    let stdOutFilename = `${count}-${processLogFilename}-stdout.txt`;
-    let stdErrFilename = `${count}-${processLogFilename}-stderr.txt`;
+    let logDir = getConfig().logDir;
+    if (typeof logDir === 'string') {
+        let stdOutFilename = `${count}-${processLogFilename}-stdout.txt`;
+        let stdErrFilename = `${count}-${processLogFilename}-stderr.txt`;
 
-    let outputDirectory = 'c:/spr-output';
-    fs.mkdirSync(outputDirectory,{recursive: true});
-    let stdOutStream = fs.createWriteStream(path.join(outputDirectory, stdOutFilename), {flags: 'w+'});
-    let stdErrStream = fs.createWriteStream(path.join(outputDirectory, stdErrFilename), {flags: 'w+'});
+        if(!path.isAbsolute(logDir)) {
+            logDir = path.join(process.cwd(), logDir);
+        }
+        console.log("logging to", logDir);
+        fs.mkdirSync(logDir, {recursive: true});
+        let stdOutStream = fs.createWriteStream(path.join(logDir, stdOutFilename), {flags: 'w+'});
+        let stdErrStream = fs.createWriteStream(path.join(logDir, stdErrFilename), {flags: 'w+'});
 
-    execaProcess.stdout.pipe(stdOutStream);
-    execaProcess.stderr.pipe(stdErrStream);
+        execaProcess.stdout.pipe(stdOutStream);
+        execaProcess.stderr.pipe(stdErrStream);
+    }
 
     allProcesses.push(execaProcess);
     return execaProcess;

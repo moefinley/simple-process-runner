@@ -31,10 +31,10 @@ export function start(){
         });
 
         runAlongsideProcesses.forEach(kill);
-        console.log(getConfig().successMessage);
+        if(typeof getConfig().successMessage === 'string') console.log(getConfig().successMessage);
         process.exit(0);
     }).catch(() => {
-        console.log(getConfig().errorMessage);
+        if(typeof getConfig().errorMessage === 'string') console.log(getConfig().errorMessage);
         killAll();
         process.exit(1);
     });

@@ -1,10 +1,11 @@
 export interface Config {
-    runAlongsideProcesses: ProcessConfig[],
-    concurrentProcesses: ProcessConfig[],
-    serialProcesses: ProcessConfig[],
-    successMessage: string,
-    errorMessage: string,
-    debug: boolean
+    runAlongsideProcesses?: ProcessConfig[],
+    concurrentProcesses?: ProcessConfig[],
+    serialProcesses?: ProcessConfig[],
+    successMessage?: string,
+    errorMessage?: string,
+    debug?: boolean,
+    logDir?: string
 }
 
 export type ProcessConfig = {
