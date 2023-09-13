@@ -6,6 +6,7 @@
   "bin": "./index.mjs",
   "scripts": {
     "test-serial": "node ./index.mjs test/serial-config.json",
+    "test-serial-repeat": "node ./index.mjs test/serial-repeat-config.json",
     "test-concurrent": "node ./index.mjs test/concurrent-config.json",
     "test-string": "node ./index.mjs test/string-fail-config.json",
     "test-mixed": "node ./index.mjs test/mixed-config.json",

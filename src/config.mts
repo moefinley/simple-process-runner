@@ -11,7 +11,8 @@ export type ProcessConfig = {
     name: string,
     command: string,
     args?: string,
-    failIfSeen: string[]
+    failIfSeen?: string[],
+    numberOfRuns?: number;
 }
 
 let _config: Config = {

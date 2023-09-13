@@ -1,0 +1,12 @@
+{
+  "successMessage": "All processes completed successfully",
+  "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
+  "serialProcesses": [
+    {
+      "name": "Process One",
+      "command": "node",
+      "args": "run-successfully-2sec.js",
+      "numberOfRuns": 3
+    }
+  ]
+}
