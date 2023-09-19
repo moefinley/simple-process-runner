@@ -4,15 +4,9 @@
   "logDir": "../logs",
   "serialProcesses": [
     {
-      "name": "Process One",
-      "command": "node",
-      "args": "run-successfully-2sec.js",
-      "numberOfRuns": 2
-    },
-    {
-      "name": "Process Two",
-      "command": "node",
-      "args": "run-successfully-2sec.js",
+      "name": "Parent Process",
+      "command": "npx",
+      "args": "simple-process-runner serial-repeat-config.json",
       "numberOfRuns": 2
     }
   ]

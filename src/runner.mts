@@ -101,21 +101,21 @@ function* serialRunner(processes: ProcessConfig[]) {
 
 const runProcess = (childProcessConfig: ProcessConfig, processLogFilename: string, shouldCheckForFailureStrings: boolean = true): ExecaChildProcess => {
     const repeatMessage = typeof childProcessConfig.numberOfRuns === 'number' && !isNaN(childProcessConfig.numberOfRuns) ? `${childProcessConfig.numberOfRuns} run${childProcessConfig.numberOfRuns > 1 ? 's' : ''} remaining` : '';
+    let processId = counter++;
     console.log('Starting process', `"${childProcessConfig.name}"`, repeatMessage);
     let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {
         signal: abortController.signal,
         stripFinalNewline: false
     });
     execaProcess.stdout.on('data', data => {
-        console.log(`${childProcessConfig.name}::: `, data.toString());
+        console.log(`${childProcessConfig.name} (${processId})> `, data.toString());
         if (shouldCheckForFailureStrings)
             checkForFailureStrings(childProcessConfig, data);
     });
-    let count = counter++;
     let logDir = getConfig().logDir;
     if (typeof logDir === 'string') {
-        let stdOutFilename = `${count}-${processLogFilename}-stdout.txt`;
-        let stdErrFilename = `${count}-${processLogFilename}-stderr.txt`;
+        let stdOutFilename = `${processId}-${processLogFilename}-stdout.txt`;
+        let stdErrFilename = `${processId}-${processLogFilename}-stderr.txt`;
 
         if(!path.isAbsolute(logDir)) {
             logDir = path.join(process.cwd(), logDir);

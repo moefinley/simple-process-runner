@@ -27,6 +27,13 @@ let _config: Config = {
 
 export function setConfig(config: Partial<Config>) {
     _config = { ..._config, ...config };
+
+    function setNumberOfRuns(process: ProcessConfig) {
+        if(typeof process.numberOfRuns !== 'number') process.numberOfRuns = 1;
+    }
+
+    _config.concurrentProcesses.forEach(setNumberOfRuns);
+    _config.serialProcesses.forEach(setNumberOfRuns);
 }
 
 export function getConfig(): Config {
