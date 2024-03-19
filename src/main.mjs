@@ -1,16 +1,23 @@
-import { Argument, program } from 'commander';
+import { program } from 'commander';
 import * as fs from "fs";
 import * as path from 'path';
 import { kill, killAll, run, runAlongsideProcesses } from "./runner.mjs";
 import { getConfig, setConfig } from "./config.mjs";
 import * as debug from "./debug.mjs";
 export function start() {
-    program.addArgument(new Argument('Config', 'JSON file containing the config including the processes you want to run'));
-    program.parse();
-    let { name, ext, dir } = path.parse(program.args[0]);
-    if (dir)
-        process.chdir(dir);
-    setConfig(JSON.parse(fs.readFileSync(name + ext).toString()));
+    program.argument('Config', 'JSON file containing the config including the processes you want to run');
+    program.option('-w, --wkdir <type>', 'The working directory that all scripts will be run in. If not specified the working directory will be the same as the config file.');
+    program.parse(process.argv);
+    let { base, dir } = path.parse(program.args[0]);
+    const options = program.opts();
+    const pathToConfig = path.resolve(process.cwd(), path.resolve(dir, base));
+    if (options.wkdir) {
+        process.chdir(path.resolve(process.cwd(), options.wkdir));
+    }
+    else {
+        process.chdir(path.resolve(process.cwd(), dir));
+    }
+    setConfig(JSON.parse(fs.readFileSync(pathToConfig).toString()));
     run(getConfig()).then(returnValues => {
         function logCompletedProcess(value) {
             debug.log(`${value.command} `, value.failed ? "failed" : "succeeded");

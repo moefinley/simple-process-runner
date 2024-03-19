@@ -1,0 +1,15 @@
+{
+  "successMessage": "Bespoke working directory completed successfully",
+  "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
+  "serialProcesses": [
+    {
+      "name": "Write the current working directory",
+      "command": "node",
+      "args": "write-cwd.js"
+    },
+    {
+      "name": "List files in the current directory",
+      "command": "dir"
+    }
+  ]
+}

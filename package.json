@@ -11,7 +11,9 @@
     "test-concurrent": "node ./index.mjs test/concurrent-config.json",
     "test-string": "node ./index.mjs test/string-fail-config.json",
     "test-mixed": "node ./index.mjs test/mixed-config.json",
-    "test-mixed-success": "node ./index.mjs test/mixed-success-config.json"
+    "test-mixed-success": "node ./index.mjs test/mixed-success-config.json",
+    "test-bespoke-w": "node ./index.mjs -w ./test test/bespoke-working-dir.json",
+    "test-bespoke-wkdir": "node ./index.mjs --wkdir ./test test/bespoke-working-dir.json"
   },
   "repository": "https://github.com/moefinley/simple-process-runner",
   "homepage": "https://github.com/moefinley/simple-process-runner",

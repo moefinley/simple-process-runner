@@ -1,21 +1,28 @@
-import {Argument, program} from 'commander';
+import {program} from 'commander';
 import * as fs from "fs";
 import * as path from 'path';
 import {kill, killAll, run, runAlongsideProcesses} from "./runner.mjs";
 import type {Config} from "./config.mjs";
-import {ExecaReturnValue} from "execa";
 import {getConfig, setConfig} from "./config.mjs";
+import {ExecaReturnValue} from "execa";
 import * as debug from "./debug.mjs";
 
 export function start(){
-    program.addArgument(new Argument('Config', 'JSON file containing the config including the processes you want to run'));
-    program.parse();
+    program.argument('Config', 'JSON file containing the config including the processes you want to run');
+    program.option('-w, --wkdir <type>', 'The working directory that all scripts will be run in. If not specified the working directory will be the same as the config file.');
+    program.parse(process.argv);
 
-    let { name, ext, dir } = path.parse(program.args[0]);
+    let { base, dir } = path.parse(program.args[0]);
+    const options = program.opts();
+    const pathToConfig = path.resolve(process.cwd(), path.resolve(dir, base));
 
-    if(dir)
-        process.chdir(dir);
-    setConfig(JSON.parse(fs.readFileSync(name + ext).toString()) as Config);
+    if(options.wkdir) {
+        process.chdir(path.resolve(process.cwd(), options.wkdir));
+    } else {
+        process.chdir(path.resolve(process.cwd(), dir));
+    }
+
+    setConfig(JSON.parse(fs.readFileSync(pathToConfig).toString()) as Config);
 
     run(getConfig()).then(returnValues => {
         function logCompletedProcess(value: ExecaReturnValue<string>) {
