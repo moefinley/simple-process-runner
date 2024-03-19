@@ -8,7 +8,9 @@ Run multiple processes and
 
 ## How to run
 
-To run create a config file and run `npx simple-process-runner my-config.json`
+To run create a config file and run `npx simple-process-runner my-config.json`. The working directory will be the same 
+as the config file e.g. `npx simple-process-runner ./my-config-dir/my-config.json` will set the working directory to 
+`my-config-dir`.
 
 ## How to create a config file
 
@@ -40,7 +42,7 @@ To run create a config file and run `npx simple-process-runner my-config.json`
   "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
   "serialProcesses": [
     {
-      "name": "List files",
+      "name": "Get example page",
       "command": "powershell",
       "args": "Invoke-WebRequest -URI https://www.example.com",
       "failIfSeen": [
