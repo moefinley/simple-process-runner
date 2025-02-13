@@ -3,8 +3,8 @@
   "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
   "concurrentProcesses": [
     {
-      "name": "List files",
-      "command": "dir"
+      "name": "Say hello",
+      "command": "echo hello"
     },
     {
       "name": "Process One",

@@ -1,0 +1,11 @@
+{
+  "successMessage": "All processes completed successfully",
+  "errorMessage": "##teamcity[buildProblem description='Processes failed to run']",
+  "logDir": "../logs",
+  "serialProcesses": [
+    {
+      "name": "List files",
+      "command": "echo hello"
+    }
+  ]
+}

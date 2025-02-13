@@ -4,8 +4,8 @@
   "logDir": "../logs",
   "serialProcesses": [
     {
-      "name": "List files",
-      "command": "dir"
+      "name": "Say hello",
+      "command": "echo hello"
     },
     {
       "name": "Process One",
