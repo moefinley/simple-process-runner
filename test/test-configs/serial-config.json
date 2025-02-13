@@ -5,7 +5,8 @@
   "serialProcesses": [
     {
       "name": "Say hello",
-      "command": "echo hello"
+      "command": "echo",
+      "args": "hello"
     },
     {
       "name": "Process One",
