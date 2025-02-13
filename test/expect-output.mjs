@@ -1,5 +1,6 @@
 import {execa} from "execa";
 import assert from "assert";
+import chalk from "chalk";
 
 export function expectOutput(testConfigPath, expectedStdOut, expectedStdErr, expectedExitCode = 0) {
     it('should output the correct text', async () => {
@@ -27,7 +28,7 @@ function checkSubstringsOrder(str, substrings) {
     for (const substring of substrings) {
         currentIndex = str.indexOf(substring, currentIndex);
         if (currentIndex === -1) {
-            assert.fail(`Substring not found: ${substring}\nin the string:\n${str}`);
+            assert.fail(`Substring not found: ${substring}\nin the string:\n${chalk.italic(str)}`);
         }
         currentIndex += substring.length;
     }

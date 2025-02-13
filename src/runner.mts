@@ -4,6 +4,7 @@ import {execa, ExecaChildProcess, ExecaReturnValue} from 'execa';
 import * as debug from "./debug.mjs";
 import * as fs from "fs";
 import * as path from "path";
+import chalk, {backgroundColorNames} from "chalk";
 
 export const runAlongsideProcesses: Array<ExecaChildProcess> = [];
 const allProcesses: Array<ExecaChildProcess> = [];
@@ -98,17 +99,23 @@ function* serialRunner(processes: ProcessConfig[]) {
         }
     }
 }
-
+let colourIndex = 1;
 const runProcess = (childProcessConfig: ProcessConfig, processLogFilename: string, shouldCheckForFailureStrings: boolean = true): ExecaChildProcess => {
+    if(colourIndex === 15) colourIndex = 1
+    const chalkColour = backgroundColorNames[colourIndex++];
+
+    function log(...args: string[]){
+        console.log(chalk[chalkColour](args.join(' ')));
+    }
     const repeatMessage = typeof childProcessConfig.numberOfRuns === 'number' && !isNaN(childProcessConfig.numberOfRuns) ? `${childProcessConfig.numberOfRuns} run${childProcessConfig.numberOfRuns > 1 ? 's' : ''} remaining` : '';
     let processId = counter++;
-    console.log('Starting process', `"${childProcessConfig.name}"`, repeatMessage);
+    log('Starting process', `"${childProcessConfig.name}"`, repeatMessage);
     let execaProcess = execa(childProcessConfig.command, childProcessConfig.args?.split(' '), {
         signal: abortController.signal,
         stripFinalNewline: false
     });
     execaProcess.stdout.on('data', data => {
-        console.log(`${childProcessConfig.name} (${processId})> `, data.toString());
+        log(`${childProcessConfig.name} (${processId})> \n`, data.toString());
         if (shouldCheckForFailureStrings)
             checkForFailureStrings(childProcessConfig, data);
     });
@@ -120,7 +127,7 @@ const runProcess = (childProcessConfig: ProcessConfig, processLogFilename: strin
         if(!path.isAbsolute(logDir)) {
             logDir = path.join(process.cwd(), logDir);
         }
-        console.log("logging to", logDir);
+        log("logging to", logDir);
         fs.mkdirSync(logDir, {recursive: true});
         let stdOutStream = fs.createWriteStream(path.join(logDir, stdOutFilename), {flags: 'w+'});
         let stdErrStream = fs.createWriteStream(path.join(logDir, stdErrFilename), {flags: 'w+'});
