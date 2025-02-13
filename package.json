@@ -5,7 +5,7 @@
   "main": "index.mjs",
   "bin": "./index.mjs",
   "scripts": {
-    "test": "mocha ./test/",
+    "test": "npx mocha ./test/",
     "test-serial": "node ./index.mjs test/test-configs/serial-config.json",
     "test-serial-repeat": "node ./index.mjs test/test-configs/serial-repeat-config.json",
     "test-serial-repeat-spr": "node ./index.mjs test/test-configs/serial-repeat-spr-config.json",
