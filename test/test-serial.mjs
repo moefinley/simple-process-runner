@@ -16,5 +16,5 @@ describe('Serial processes', function () {
         'Fail after 2secs running',
         'Fail after 2secs I don\'t feel to good...'
     ];
-    expectOutput('./test/test-configs/serial-config.json', expectedOutput, [''], 1);
+    expectOutput('./test/test-configs/serial-config.json', expectedOutput, [''], {expectedExitCode: 1});
 });

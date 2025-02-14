@@ -23,5 +23,5 @@ describe('Concurrent processes', function () {
         '##teamcity[buildProblem description=\'Processes failed to run\']'
     ];
     const expectedStdErr = [''];
-    expectOutput('./test/test-configs/concurrent-config.json', expectedStdOut, expectedStdErr, 1);
+    expectOutput('./test/test-configs/concurrent-config.json', expectedStdOut, expectedStdErr, {expectedExitCode: 1, checkOrder: false});
 });

@@ -2,7 +2,20 @@ import {execa} from "execa";
 import assert from "assert";
 import chalk from "chalk";
 
-export function expectOutput(testConfigPath, expectedStdOut, expectedStdErr, expectedExitCode = 0) {
+export function expectOutput(
+    testConfigPath,
+    expectedStdOut,
+    expectedStdErr,
+    options = {
+        expectedExitCode: 0,
+        checkOrder: true
+    }) {
+
+    const {
+        expectedExitCode = 0,
+        checkOrder = true
+    } = options;
+
     it('should output the correct text', async () => {
         let stdout;
         let stderr;
@@ -14,12 +27,21 @@ export function expectOutput(testConfigPath, expectedStdOut, expectedStdErr, exp
             stderr = e.stderr;
             exitCode = e.exitCode;
         }
-        checkSubstringsOrder(stdout, expectedStdOut);
+        checkOrder ? checkSubstringsOrder(stdout, expectedStdOut) : checkSubstringExists(stdout, expectedStdOut);
         if (!!expectedStdErr) {
-            checkSubstringsOrder(stderr, expectedStdErr);
+            checkOrder ? checkSubstringsOrder(stderr, expectedStdErr) : checkSubstringExists(stdout, expectedStdOut);
         }
         assert.equal(exitCode, expectedExitCode);
     });
+}
+
+function checkSubstringExists(str, substrings) {
+    for (const substring of substrings) {
+        if (!str.includes(substring)) {
+            assert.fail(`Substring not found: ${substring}\nWas not found in string:\n${chalk.italic(str)}`);
+            break;
+        }
+    }
 }
 
 function checkSubstringsOrder(str, substrings) {
@@ -28,7 +50,7 @@ function checkSubstringsOrder(str, substrings) {
     for (const substring of substrings) {
         currentIndex = str.indexOf(substring, currentIndex);
         if (currentIndex === -1) {
-            assert.fail(`Substring not found: ${substring}\nin the string:\n${chalk.italic(str)}`);
+            assert.fail(`Substring not found: ${substring} at index ${currentIndex}\nWas not found in string:\n${chalk.italic(str)}`);
         }
         currentIndex += substring.length;
     }
